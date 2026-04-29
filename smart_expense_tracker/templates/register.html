@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ — Create Account</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0b0f1a;--surface:#111827;--s2:#1a2236;--s3:#1f2a3e;
+      --border:rgba(255,255,255,0.07);--bh:rgba(255,255,255,0.13);
+      --accent:#00d68f;--a2:#3b82f6;--a3:#f59e0b;--a4:#ec4899;
+      --text:#f1f5f9;--muted:#64748b;--danger:#f87171;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+    body::before{
+      content:'';position:fixed;inset:0;
+      background:radial-gradient(ellipse 700px 500px at 80% 10%,rgba(59,130,246,.07) 0%,transparent 60%),
+                 radial-gradient(ellipse 600px 450px at 15% 85%,rgba(0,214,143,.06) 0%,transparent 60%);
+      pointer-events:none;z-index:0;
+    }
+    .page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+    @media(max-width:900px){.page{grid-template-columns:1fr;}.right-deco{display:none;} html,body{overflow:auto;}}
+
+    /* FORM SIDE */
+    .form-side{
+      display:flex;flex-direction:column;justify-content:center;
+      padding:3rem 2.5rem;position:relative;overflow:hidden;z-index:1;
+    }
+    .form-side::after{
+      content:'';position:absolute;bottom:-100px;left:-80px;
+      width:380px;height:380px;border-radius:50%;
+      background:var(--a2);filter:blur(140px);opacity:.07;
+      animation:breathe 8s ease-in-out infinite alternate;pointer-events:none;
+    }
+    .glow-tr{
+      position:absolute;top:-100px;right:-60px;width:300px;height:300px;
+      border-radius:50%;background:var(--accent);filter:blur(130px);opacity:.07;
+      animation:breathe 10s 4s ease-in-out infinite alternate;pointer-events:none;
+    }
+    @keyframes breathe{from{opacity:.06;}to{opacity:.13;}}
+
+    .brand{
+      display:flex;align-items:center;gap:.55rem;
+      font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;
+      letter-spacing:-.4px;color:var(--text);text-decoration:none;
+      margin-bottom:2.4rem;position:relative;z-index:1;width:fit-content;
+    }
+    .brand-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent);}
+
+    .form-wrap{position:relative;z-index:1;width:100%;max-width:420px;animation:slideUp .5s ease both;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+    .f-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.55rem;}
+    .f-title{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-.5px;line-height:1.15;margin-bottom:.4rem;}
+    .f-sub{color:var(--muted);font-size:.875rem;margin-bottom:1.8rem;line-height:1.6;}
+
+    /* step chips */
+    .step-chips{display:flex;align-items:center;gap:.5rem;margin-bottom:1.6rem;}
+    .step-chip{display:flex;align-items:center;gap:.38rem;font-size:.72rem;font-weight:600;color:var(--muted);}
+    .s-num{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.63rem;}
+    .step-chip.active .s-num{background:var(--accent);border-color:var(--accent);color:#021a0e;}
+    .step-chip.active{color:var(--text);}
+    .s-sep{width:28px;height:1px;background:var(--border);}
+
+    .field-wrap{margin-bottom:1.1rem;}
+    .field-label{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;display:block;}
+    .input-shell{position:relative;}
+    .input-shell .fi-i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.95rem;pointer-events:none;transition:color .2s;}
+    .input-shell:focus-within .fi-i{color:var(--accent);}
+    .f-input{
+      width:100%;background:var(--s2);border:1px solid var(--border);border-radius:12px;
+      padding:.82rem 1rem .82rem 2.8rem;color:var(--text);font-family:'DM Sans',sans-serif;
+      font-size:.92rem;outline:none;transition:border-color .2s,box-shadow .2s;
+    }
+    .f-input::placeholder{color:var(--muted);}
+    .f-input:focus{border-color:rgba(0,214,143,.45);box-shadow:0 0 0 3px rgba(0,214,143,.1);}
+    .pw-toggle{position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;padding:0;transition:color .2s;}
+    .pw-toggle:hover{color:var(--text);}
+
+    /* strength bar */
+    .str-wrap{margin-top:.45rem;}
+    .str-track{height:4px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;}
+    .str-fill{height:100%;border-radius:99px;width:0%;transition:width .4s,background .4s;}
+    .str-label{font-size:.7rem;color:var(--muted);margin-top:.3rem;}
+
+    .terms-wrap{display:flex;align-items:flex-start;gap:.6rem;margin-bottom:1.4rem;margin-top:.3rem;}
+    .terms-wrap input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;margin-top:2px;}
+    .terms-wrap label{font-size:.8rem;color:var(--muted);cursor:pointer;line-height:1.5;}
+    .terms-wrap label a{color:var(--accent);text-decoration:none;}
+
+    .btn-main{
+      width:100%;padding:.88rem;
+      background:linear-gradient(135deg,var(--accent),#00b87a);
+      color:#021a0e;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;
+      border:none;border-radius:12px;cursor:pointer;
+      transition:transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;
+    }
+    .btn-main:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,214,143,.25);}
+
+    .divider{display:flex;align-items:center;gap:.8rem;margin:1.3rem 0;color:var(--muted);font-size:.73rem;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+    .link-row{text-align:center;font-size:.85rem;color:var(--muted);}
+    .link-row a{color:var(--accent);font-weight:600;text-decoration:none;}
+
+    .flash-msg{padding:.7rem 1rem;border-radius:10px;font-size:.82rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;}
+    .flash-error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--danger);}
+    .flash-success{background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.2);color:var(--accent);}
+
+    /* DECO SIDE */
+    .right-deco{
+      background:var(--surface);border-left:1px solid var(--border);
+      position:relative;overflow:hidden;display:flex;flex-direction:column;
+      justify-content:space-between;padding:2.5rem;
+    }
+    .right-deco::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;}
+    .right-deco::after{content:'';position:absolute;top:-100px;right:-80px;width:380px;height:380px;border-radius:50%;background:var(--a3);filter:blur(140px);opacity:.08;pointer-events:none;}
+    .deco-blob-g{position:absolute;bottom:-100px;left:-60px;width:300px;height:300px;border-radius:50%;background:var(--accent);filter:blur(130px);opacity:.07;pointer-events:none;}
+    .d-brand{position:relative;z-index:1;display:flex;align-items:center;gap:.55rem;font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:-.4px;}
+    .feat-list2{position:relative;z-index:1;display:flex;flex-direction:column;gap:1.2rem;}
+    .fi2{display:flex;gap:.9rem;align-items:flex-start;}
+    .fi2-ico{width:40px;height:40px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+    .fi2-t{font-size:.9rem;font-weight:700;margin-bottom:.15rem;}
+    .fi2-d{font-size:.76rem;color:var(--muted);line-height:1.5;}
+    .stat-band{position:relative;z-index:1;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.3rem;display:flex;gap:1.4rem;flex-wrap:wrap;}
+    .st-item{display:flex;flex-direction:column;}
+    .st-val{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.4px;}
+    .st-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+    .st-div{width:1px;background:var(--border);align-self:stretch;}
+    .d-quote{position:relative;z-index:1;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:1rem 1.2rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
+    .d-quote strong{color:var(--text);}
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- FORM SIDE -->
+  <div class="form-side">
+    <div class="glow-tr"></div>
+    <a href="/login" class="brand"><span class="brand-dot"></span>ExpenseIQ</a>
+    <div class="form-wrap">
+      <p class="f-eyebrow"><i class="bi bi-stars me-1"></i>Free Account</p>
+      <h1 class="f-title">Create your<br>account</h1>
+      <p class="f-sub">Join and start tracking smarter with ML-powered predictions. Setup takes under 60 seconds.</p>
+
+      <div class="step-chips">
+        <div class="step-chip active"><div class="s-num">1</div>Your Info</div>
+        <div class="s-sep"></div>
+        <div class="step-chip"><div class="s-num">2</div>Secure</div>
+        <div class="s-sep"></div>
+        <div class="step-chip"><div class="s-num">3</div>Dashboard</div>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}"><i class="bi bi-exclamation-circle"></i>{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form action="/register" method="POST" novalidate id="regForm">
+        <div class="field-wrap">
+          <label class="field-label" for="name">Full Name</label>
+          <div class="input-shell">
+            <input type="text" id="name" name="name" class="f-input" placeholder="Your full name" autocomplete="name" required value="{{ request.form.name if request.form.name }}"/>
+            <i class="bi bi-person fi-i"></i>
+          </div>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label" for="email">Email Address</label>
+          <div class="input-shell">
+            <input type="email" id="email" name="email" class="f-input" placeholder="you@example.com" autocomplete="email" required value="{{ request.form.email if request.form.email }}"/>
+            <i class="bi bi-envelope fi-i"></i>
+          </div>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label" for="password">Password</label>
+          <div class="input-shell">
+            <input type="password" id="password" name="password" class="f-input" placeholder="Min. 8 characters" autocomplete="new-password" required/>
+            <i class="bi bi-lock fi-i"></i>
+            <button type="button" class="pw-toggle" id="pwBtn"><i class="bi bi-eye" id="pwIcon"></i></button>
+          </div>
+          <div class="str-wrap" id="strWrap" style="display:none">
+            <div class="str-track"><div class="str-fill" id="strFill"></div></div>
+            <div class="str-label" id="strLabel">Strength: —</div>
+          </div>
+        </div>
+        <div class="terms-wrap">
+          <input type="checkbox" id="terms" name="terms" required/>
+          <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</label>
+        </div>
+        <button type="submit" class="btn-main" id="submitBtn"><i class="bi bi-person-plus-fill"></i>Create Free Account</button>
+      </form>
+
+      <div class="divider">already have an account?</div>
+      <div class="link-row"><a href="/login">← Sign in to ExpenseIQ</a></div>
+    </div>
+  </div>
+
+  <!-- DECO SIDE -->
+  <div class="right-deco">
+    <div class="deco-blob-g"></div>
+    <div class="d-brand"><span class="brand-dot"></span>ExpenseIQ</div>
+    <div class="feat-list2">
+      <div class="fi2">
+        <div class="fi2-ico" style="background:rgba(0,214,143,.1);color:var(--accent)"><i class="bi bi-plus-circle-fill"></i></div>
+        <div><div class="fi2-t">Instant Expense Logging</div><div class="fi2-d">Add transactions in seconds. Auto-categorise by type.</div></div>
+      </div>
+      <div class="fi2">
+        <div class="fi2-ico" style="background:rgba(59,130,246,.1);color:var(--a2)"><i class="bi bi-bar-chart-line-fill"></i></div>
+        <div><div class="fi2-t">Visual Analytics Dashboard</div><div class="fi2-d">Interactive charts reveal your spending patterns and trends.</div></div>
+      </div>
+      <div class="fi2">
+        <div class="fi2-ico" style="background:rgba(245,158,11,.1);color:var(--a3)"><i class="bi bi-cpu-fill"></i></div>
+        <div><div class="fi2-t">ML-Powered Predictions</div><div class="fi2-d">Our model forecasts next month's spend with high accuracy.</div></div>
+      </div>
+      <div class="fi2">
+        <div class="fi2-ico" style="background:rgba(248,113,113,.1);color:var(--danger)"><i class="bi bi-shield-lock-fill"></i></div>
+        <div><div class="fi2-t">Secure &amp; Private</div><div class="fi2-d">All data encrypted. Your finances stay private — always.</div></div>
+      </div>
+    </div>
+    <div class="stat-band">
+      <div class="st-item"><span class="st-val" style="color:var(--accent)">ML</span><span class="st-lbl">Predictions</span></div>
+      <div class="st-div"></div>
+      <div class="st-item"><span class="st-val" style="color:var(--a2)">₹0</span><span class="st-lbl">Cost to Join</span></div>
+      <div class="st-div"></div>
+      <div class="st-item"><span class="st-val" style="color:var(--a3)">60s</span><span class="st-lbl">Setup Time</span></div>
+    </div>
+    <div class="d-quote">&#11088; <strong>"Saved money in my first month"</strong> — The ML predictions helped me see where my money was going before I spent it.</div>
+  </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('pwBtn').addEventListener('click',function(){
+    const pw=document.getElementById('password');const icon=document.getElementById('pwIcon');
+    if(pw.type==='password'){pw.type='text';icon.className='bi bi-eye-slash';}else{pw.type='password';icon.className='bi bi-eye';}
+  });
+  document.getElementById('password').addEventListener('input',function(){
+    const v=this.value,wrap=document.getElementById('strWrap'),fill=document.getElementById('strFill'),lbl=document.getElementById('strLabel');
+    if(!v){wrap.style.display='none';return;}wrap.style.display='block';
+    let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
+    const lvls=[{p:'20%',c:'#f87171',t:'Weak'},{p:'45%',c:'#f59e0b',t:'Fair'},{p:'75%',c:'#3b82f6',t:'Good'},{p:'100%',c:'#00d68f',t:'Strong ✓'}];
+    const l=lvls[Math.max(s-1,0)];fill.style.width=l.p;fill.style.background=l.c;lbl.textContent='Strength: '+l.t;lbl.style.color=l.c;
+  });
+  document.getElementById('regForm').addEventListener('submit',function(){
+    const btn=document.getElementById('submitBtn');btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Creating…';btn.disabled=true;
+  });
+</script>
+</body>
+</html>

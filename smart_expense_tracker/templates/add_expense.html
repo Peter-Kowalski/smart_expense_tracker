@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ — Add Expense</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0b0f1a;--surface:#111827;--s2:#1a2236;--s3:#1f2a3e;
+      --border:rgba(255,255,255,0.07);--bh:rgba(255,255,255,0.13);
+      --accent:#00d68f;--a2:#3b82f6;--a3:#f59e0b;--a4:#ec4899;--a5:#8b5cf6;
+      --text:#f1f5f9;--muted:#64748b;--danger:#f87171;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 700px 500px at 15% 10%,rgba(0,214,143,.06) 0%,transparent 60%),radial-gradient(ellipse 500px 400px at 85% 80%,rgba(59,130,246,.05) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+    .navbar{background:rgba(11,15,26,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:.85rem 2rem;position:sticky;top:0;z-index:200;}
+    .brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;letter-spacing:-.4px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:.5rem;}
+    .brand-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent);}
+    .nav-crumb{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);}
+    .nav-crumb a{color:var(--muted);text-decoration:none;transition:color .2s;}
+    .nav-crumb a:hover{color:var(--accent);}
+    .nav-crumb .sep{opacity:.4;}
+    .nav-crumb .cur{color:var(--accent);font-weight:600;}
+
+    .page-wrap{position:relative;z-index:1;min-height:calc(100vh - 68px);display:flex;align-items:flex-start;justify-content:center;padding:3rem 1.5rem 5rem;}
+    .content-col{width:100%;max-width:680px;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+    .anim{animation:slideUp .45s ease both;}
+
+    .btn-back{display:inline-flex;align-items:center;gap:.45rem;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:50px;padding:.42rem 1rem;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .2s;margin-bottom:1.6rem;}
+    .btn-back:hover{color:var(--text);background:rgba(255,255,255,.09);border-color:var(--bh);transform:translateX(-2px);}
+
+    .page-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem;}
+    .page-title{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-.5px;line-height:1.15;margin-bottom:.35rem;}
+    .page-sub{color:var(--muted);font-size:.875rem;line-height:1.6;margin-bottom:1.8rem;}
+
+    .form-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+    .card-strip{height:4px;background:linear-gradient(90deg,var(--accent),var(--a2),var(--a3));}
+    .card-inner{padding:2.2rem 2.4rem 2rem;}
+    @media(max-width:576px){.card-inner{padding:1.5rem 1.3rem;}}
+
+    .card-top{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem;}
+    .card-ico{width:50px;height:50px;border-radius:15px;background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--accent);flex-shrink:0;}
+    .card-top-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;}
+    .card-top-sub{font-size:.78rem;color:var(--muted);margin-top:.1rem;}
+
+    .field-wrap{margin-bottom:1.2rem;}
+    .field-label{display:flex;align-items:center;gap:.4rem;font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.45rem;}
+    .field-label .req{color:var(--accent);font-size:.63rem;}
+    .field-label .opt{margin-left:auto;font-size:.68rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;}
+    .input-shell{position:relative;}
+    .input-shell .fi{position:absolute;left:1.1rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:1rem;pointer-events:none;transition:color .2s;}
+    .input-shell:focus-within .fi{color:var(--accent);}
+    .amt-pfx{position:absolute;left:1.1rem;top:50%;transform:translateY(-50%);font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--muted);pointer-events:none;transition:color .2s;}
+    .input-shell:focus-within .amt-pfx{color:var(--accent);}
+
+    .f-input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:13px;padding:.88rem 1rem .88rem 2.9rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;}
+    .f-input::placeholder{color:var(--muted);}
+    .f-input:hover{border-color:var(--bh);background:var(--s3);}
+    .f-input:focus{border-color:rgba(0,214,143,.45);box-shadow:0 0 0 3px rgba(0,214,143,.1);background:var(--s3);}
+    .f-input.amt{padding-left:2.5rem;}
+    select.f-input{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1.1rem center;padding-right:2.5rem;}
+    select.f-input option{background:#1a2236;}
+    textarea.f-input{resize:none;height:85px;padding-top:.88rem;line-height:1.55;}
+    .input-shell.ta-shell .fi{top:1rem;transform:none;}
+    input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer;}
+
+    /* Category pills */
+    #category-hidden{display:none;}
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.55rem;margin-top:.4rem;}
+    .cat-pill{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.7rem .5rem;background:var(--s2);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;font-size:.73rem;font-weight:600;color:var(--muted);user-select:none;}
+    .cat-pill .cp-ic{font-size:1.2rem;transition:transform .2s;}
+    .cat-pill:hover{border-color:var(--bh);color:var(--text);}
+    .cat-pill:hover .cp-ic{transform:scale(1.12);}
+    .cat-pill.sel-food{border-color:rgba(0,214,143,.5);background:rgba(0,214,143,.08);color:var(--accent);}
+    .cat-pill.sel-transport{border-color:rgba(59,130,246,.5);background:rgba(59,130,246,.08);color:var(--a2);}
+    .cat-pill.sel-shopping{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.08);color:var(--a3);}
+    .cat-pill.sel-health{border-color:rgba(236,72,153,.5);background:rgba(236,72,153,.08);color:var(--a4);}
+    .cat-pill.sel-education{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.08);color:var(--a5);}
+    .cat-pill.sel-utilities{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--danger);}
+    .cat-pill.sel-travel{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:#34d399;}
+    .cat-pill.sel-other{border-color:rgba(156,163,175,.5);background:rgba(156,163,175,.08);color:#9ca3af;}
+    .err-msg{font-size:.73rem;color:var(--danger);margin-top:.35rem;display:none;}
+
+    /* Preview strip */
+    .preview-strip{background:var(--s2);border:1px solid var(--border);border-radius:13px;padding:.95rem 1.1rem;display:flex;align-items:center;gap:.85rem;flex-wrap:wrap;margin-bottom:1.6rem;transition:all .3s;}
+    .ps-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);flex-shrink:0;}
+    .ps-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;}
+    .ps-cat{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:600;background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.2);color:var(--accent);border-radius:50px;padding:.18rem .6rem;}
+    .ps-amt{margin-left:auto;font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;color:var(--accent);}
+
+    .form-divider{height:1px;background:var(--border);margin:1.6rem 0;}
+
+    .btn-actions{display:flex;gap:.75rem;flex-wrap:wrap;}
+    .btn-submit{flex:1;min-width:160px;padding:.9rem 1.4rem;background:linear-gradient(135deg,var(--accent),#00b87a);color:#021a0e;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,214,143,.25);}
+    .btn-cancel{padding:.9rem 1.3rem;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;border-radius:12px;cursor:pointer;text-decoration:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.4rem;white-space:nowrap;}
+    .btn-cancel:hover{background:rgba(255,255,255,.06);border-color:var(--bh);color:var(--text);}
+
+    .tip-bar{display:flex;align-items:center;gap:.55rem;background:rgba(0,214,143,.05);border:1px solid rgba(0,214,143,.12);border-radius:11px;padding:.7rem .95rem;font-size:.76rem;color:var(--muted);margin-top:1.3rem;line-height:1.5;}
+    .tip-bar i{color:var(--accent);font-size:.95rem;flex-shrink:0;}
+
+    .flash-msg{padding:.7rem 1rem;border-radius:10px;font-size:.82rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;}
+    .flash-error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--danger);}
+    .flash-success{background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.2);color:var(--accent);}
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="d-flex align-items-center justify-content-between w-100 gap-3">
+    <a href="/dashboard" class="brand"><span class="brand-dot"></span>ExpenseIQ</a>
+    <div class="nav-crumb d-none d-sm-flex">
+      <a href="/dashboard">Dashboard</a><span class="sep">/</span>
+      <span class="cur">Add Expense</span>
+    </div>
+    <div style="font-size:.82rem;color:var(--muted)" class="d-none d-md-block">
+      <i class="bi bi-calendar3 me-1"></i><span id="navDate"></span>
+    </div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="content-col anim">
+
+    <a href="/dashboard" class="btn-back"><i class="bi bi-arrow-left"></i>Back to Dashboard</a>
+
+    <p class="page-eyebrow"><i class="bi bi-plus-circle me-1"></i>New Transaction</p>
+    <h1 class="page-title">Add Expense</h1>
+    <p class="page-sub">Log a new expense below. Every entry trains our ML model for more accurate predictions.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}"><i class="bi bi-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }}"></i>{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="form-card">
+      <div class="card-strip"></div>
+      <div class="card-inner">
+        <div class="card-top">
+          <div class="card-ico"><i class="bi bi-receipt"></i></div>
+          <div><div class="card-top-title">Expense Details</div><div class="card-top-sub">Fill in the details to log your expense.</div></div>
+        </div>
+
+        <form action="/add_expense" method="POST" novalidate id="expForm">
+
+          <!-- Title -->
+          <div class="field-wrap">
+            <label class="field-label" for="title"><i class="bi bi-tag"></i>Expense Title <span class="req">●</span></label>
+            <div class="input-shell">
+              <input type="text" id="title" name="title" class="f-input" placeholder="What did you spend on?" required autocomplete="off" value="{{ request.form.title if request.form.title }}"/>
+              <i class="bi bi-pencil fi"></i>
+            </div>
+            <div class="err-msg" id="titleErr">Please enter an expense title.</div>
+          </div>
+
+          <!-- Amount -->
+          <div class="field-wrap">
+            <label class="field-label" for="amount"><i class="bi bi-currency-rupee"></i>Amount <span class="req">●</span></label>
+            <div class="input-shell">
+              <input type="number" id="amount" name="amount" class="f-input amt" placeholder="0.00" min="0.01" step="0.01" required value="{{ request.form.amount if request.form.amount }}"/>
+              <span class="amt-pfx">₹</span>
+            </div>
+            <div class="err-msg" id="amtErr">Please enter a valid amount.</div>
+          </div>
+
+          <!-- Category -->
+          <div class="field-wrap">
+            <label class="field-label"><i class="bi bi-grid"></i>Category <span class="req">●</span></label>
+            <select id="category-hidden" name="category" required>
+              <option value="">Select</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Health">Health</option>
+              <option value="Education">Education</option>
+              <option value="Utilities">Utilities</option>
+              <option value="Travel">Travel</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="cat-grid" id="catGrid">
+              <div class="cat-pill" data-cat="Food" data-cls="sel-food"><span class="cp-ic">🍕</span>Food</div>
+              <div class="cat-pill" data-cat="Transport" data-cls="sel-transport"><span class="cp-ic">🚌</span>Transport</div>
+              <div class="cat-pill" data-cat="Shopping" data-cls="sel-shopping"><span class="cp-ic">🛍️</span>Shopping</div>
+              <div class="cat-pill" data-cat="Health" data-cls="sel-health"><span class="cp-ic">💊</span>Health</div>
+              <div class="cat-pill" data-cat="Education" data-cls="sel-education"><span class="cp-ic">📚</span>Education</div>
+              <div class="cat-pill" data-cat="Utilities" data-cls="sel-utilities"><span class="cp-ic">💡</span>Utilities</div>
+              <div class="cat-pill" data-cat="Travel" data-cls="sel-travel"><span class="cp-ic">✈️</span>Travel</div>
+              <div class="cat-pill" data-cat="Other" data-cls="sel-other"><span class="cp-ic">📦</span>Other</div>
+            </div>
+            <div class="err-msg" id="catErr">Please select a category.</div>
+          </div>
+
+          <!-- Date -->
+          <div class="field-wrap">
+            <label class="field-label" for="date"><i class="bi bi-calendar3"></i>Date</label>
+            <div class="input-shell">
+              <input type="date" id="date" name="date" class="f-input" value="{{ request.form.date if request.form.date }}"/>
+              <i class="bi bi-calendar fi"></i>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="field-wrap">
+            <label class="field-label" for="notes"><i class="bi bi-chat-left-text"></i>Notes <span class="opt">Optional</span></label>
+            <div class="input-shell ta-shell">
+              <textarea id="notes" name="notes" class="f-input" placeholder="Any additional details…">{{ request.form.notes if request.form.notes }}</textarea>
+              <i class="bi bi-sticky fi"></i>
+            </div>
+          </div>
+
+          <!-- Preview strip -->
+          <div class="preview-strip" id="previewStrip">
+            <span class="ps-label">Preview</span>
+            <span class="ps-title" id="pvTitle" style="color:var(--muted);font-weight:400;font-size:.85rem;">Fill the form to preview</span>
+            <span class="ps-cat" id="pvCat" style="display:none"></span>
+            <span class="ps-amt" id="pvAmt" style="display:none"></span>
+          </div>
+
+          <div class="form-divider"></div>
+          <div class="btn-actions">
+            <button type="submit" class="btn-submit" id="submitBtn"><i class="bi bi-plus-circle-fill"></i>Add Expense</button>
+            <a href="/dashboard" class="btn-cancel"><i class="bi bi-x-circle"></i>Cancel</a>
+          </div>
+          <div class="tip-bar"><i class="bi bi-lightbulb-fill"></i><span>The more expenses you log, the more accurate our ML prediction becomes each month.</span></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Date defaults
+  const d=new Date();
+  document.getElementById('date').value=d.toISOString().split('T')[0];
+  document.getElementById('navDate').textContent=d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+  // Category pills
+  const catSel=document.getElementById('category-hidden');
+  document.querySelectorAll('.cat-pill').forEach(p=>{
+    p.addEventListener('click',()=>{
+      document.querySelectorAll('.cat-pill').forEach(x=>x.className='cat-pill');
+      p.classList.add(p.dataset.cls);
+      catSel.value=p.dataset.cat;
+      document.getElementById('catErr').style.display='none';
+      updatePreview();
+    });
+  });
+
+  // Pre-select category if form was re-submitted with error
+  const preselect='{{ request.form.category if request.form.category else "" }}';
+  if(preselect){
+    const pill=document.querySelector(`.cat-pill[data-cat="${preselect}"]`);
+    if(pill){pill.classList.add(pill.dataset.cls);catSel.value=preselect;}
+  }
+
+  // Live preview
+  const EMOJI={Food:'🍕',Transport:'🚌',Shopping:'🛍️',Health:'💊',Education:'📚',Utilities:'💡',Travel:'✈️',Other:'📦'};
+  function updatePreview(){
+    const t=document.getElementById('title').value.trim();
+    const a=parseFloat(document.getElementById('amount').value);
+    const c=catSel.value;
+    const pvT=document.getElementById('pvTitle'),pvC=document.getElementById('pvCat'),pvA=document.getElementById('pvAmt');
+    if(!t&&!a&&!c){pvT.textContent='Fill the form to preview';pvT.style.color='var(--muted)';pvT.style.fontWeight='400';pvC.style.display='none';pvA.style.display='none';return;}
+    if(t){pvT.textContent=t;pvT.style.color='';pvT.style.fontWeight='';}
+    if(c){pvC.style.display='inline-flex';pvC.textContent=(EMOJI[c]||'')+'  '+c;}else pvC.style.display='none';
+    if(!isNaN(a)&&a>0){pvA.style.display='inline';pvA.textContent='−₹'+a.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}else pvA.style.display='none';
+  }
+  document.getElementById('title').addEventListener('input',updatePreview);
+  document.getElementById('amount').addEventListener('input',updatePreview);
+
+  // Validation
+  document.getElementById('expForm').addEventListener('submit',function(e){
+    let ok=true;
+    const title=document.getElementById('title'),amt=document.getElementById('amount'),cat=catSel.value;
+    document.getElementById('titleErr').style.display='none';document.getElementById('amtErr').style.display='none';document.getElementById('catErr').style.display='none';
+    if(!title.value.trim()){document.getElementById('titleErr').style.display='block';ok=false;}
+    if(!amt.value||parseFloat(amt.value)<=0){document.getElementById('amtErr').style.display='block';ok=false;}
+    if(!cat){document.getElementById('catErr').style.display='block';ok=false;}
+    if(!ok){e.preventDefault();return;}
+    const btn=document.getElementById('submitBtn');btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Adding…';btn.disabled=true;
+  });
+</script>
+</body>
+</html>

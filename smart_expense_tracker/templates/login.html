@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ — Sign In</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0b0f1a;--surface:#111827;--s2:#1a2236;--s3:#1f2a3e;
+      --border:rgba(255,255,255,0.07);--bh:rgba(255,255,255,0.13);
+      --accent:#00d68f;--a2:#3b82f6;--a3:#f59e0b;
+      --text:#f1f5f9;--muted:#64748b;--danger:#f87171;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+    body::before{
+      content:'';position:fixed;inset:0;
+      background:radial-gradient(ellipse 700px 500px at 15% 15%,rgba(0,214,143,.07) 0%,transparent 60%),
+                 radial-gradient(ellipse 500px 400px at 85% 80%,rgba(59,130,246,.06) 0%,transparent 60%);
+      pointer-events:none;z-index:0;
+    }
+    .page{display:grid;grid-template-columns:1fr 1fr;height:100vh;}
+    @media(max-width:900px){.page{grid-template-columns:1fr;}.left-pane{display:none;}.body,html{overflow:auto;}}
+
+    /* LEFT */
+    .left-pane{
+      position:relative;background:var(--surface);
+      border-right:1px solid var(--border);
+      overflow:hidden;display:flex;flex-direction:column;
+      justify-content:space-between;padding:2.5rem;
+    }
+    .left-pane::before{
+      content:'';position:absolute;inset:0;
+      background-image:radial-gradient(circle,rgba(255,255,255,.05) 1px,transparent 1px);
+      background-size:30px 30px;pointer-events:none;
+    }
+    .left-pane::after{
+      content:'';position:absolute;top:-120px;left:-80px;
+      width:400px;height:400px;border-radius:50%;
+      background:var(--accent);filter:blur(140px);opacity:.09;
+      animation:glow 8s ease-in-out infinite alternate;pointer-events:none;
+    }
+    @keyframes glow{from{opacity:.08;transform:scale(1);}to{opacity:.14;transform:scale(1.1);}}
+    .blob-b{
+      position:absolute;bottom:-100px;right:-60px;width:320px;height:320px;
+      border-radius:50%;background:var(--a2);filter:blur(130px);opacity:.08;
+      animation:glow 10s 3s ease-in-out infinite alternate;pointer-events:none;
+    }
+    .l-brand{
+      position:relative;z-index:1;display:flex;align-items:center;gap:.55rem;
+      font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:-.4px;
+    }
+    .brand-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent);}
+    .l-center{position:relative;z-index:1;}
+    .l-tagline{position:relative;z-index:1;}
+    .l-tagline h2{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;line-height:1.2;letter-spacing:-.5px;margin-bottom:.5rem;}
+    .l-tagline h2 span{color:var(--accent);}
+    .l-tagline p{color:var(--muted);font-size:.85rem;line-height:1.6;max-width:300px;}
+    .l-quote{
+      position:relative;z-index:1;background:rgba(255,255,255,.04);
+      border:1px solid var(--border);border-radius:14px;
+      padding:1rem 1.2rem;font-size:.82rem;color:var(--muted);line-height:1.6;
+    }
+    .l-quote strong{color:var(--text);}
+
+    /* Feature pills */
+    .feat-list{display:flex;flex-direction:column;gap:1rem;}
+    .feat-item{display:flex;align-items:flex-start;gap:.85rem;}
+    .fi-ico{
+      width:38px;height:38px;border-radius:11px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:.95rem;
+    }
+    .fi-g{background:rgba(0,214,143,.1);color:var(--accent);}
+    .fi-b{background:rgba(59,130,246,.1);color:var(--a2);}
+    .fi-a{background:rgba(245,158,11,.1);color:var(--a3);}
+    .fi-t{font-size:.88rem;font-weight:600;margin-bottom:.15rem;}
+    .fi-d{font-size:.75rem;color:var(--muted);line-height:1.5;}
+
+    /* RIGHT */
+    .right-pane{
+      position:relative;z-index:1;display:flex;align-items:center;
+      justify-content:center;padding:2rem 1.5rem;overflow-y:auto;
+    }
+    .form-box{width:100%;max-width:400px;animation:slideUp .5s ease both;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+    .mob-brand{
+      display:none;align-items:center;gap:.5rem;
+      font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;
+      margin-bottom:1.8rem;justify-content:center;
+    }
+    @media(max-width:900px){.mob-brand{display:flex;}}
+
+    .f-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.55rem;}
+    .f-title{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-.5px;line-height:1.15;margin-bottom:.4rem;}
+    .f-sub{color:var(--muted);font-size:.875rem;margin-bottom:1.8rem;line-height:1.6;}
+
+    .field-wrap{margin-bottom:1.1rem;}
+    .field-label{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;display:block;}
+    .input-shell{position:relative;}
+    .input-shell .fi-i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.95rem;pointer-events:none;transition:color .2s;}
+    .input-shell:focus-within .fi-i{color:var(--accent);}
+    .f-input{
+      width:100%;background:var(--s2);border:1px solid var(--border);border-radius:12px;
+      padding:.82rem 1rem .82rem 2.8rem;color:var(--text);font-family:'DM Sans',sans-serif;
+      font-size:.92rem;outline:none;transition:border-color .2s,box-shadow .2s;
+    }
+    .f-input::placeholder{color:var(--muted);}
+    .f-input:focus{border-color:rgba(0,214,143,.45);box-shadow:0 0 0 3px rgba(0,214,143,.1);}
+    .f-input.err{border-color:rgba(248,113,113,.6)!important;box-shadow:0 0 0 3px rgba(248,113,113,.1)!important;}
+    .pw-toggle{position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;padding:0;transition:color .2s;}
+    .pw-toggle:hover{color:var(--text);}
+
+    .btn-main{
+      width:100%;padding:.88rem;
+      background:linear-gradient(135deg,var(--accent),#00b87a);
+      color:#021a0e;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;
+      border:none;border-radius:12px;cursor:pointer;letter-spacing:.02em;
+      transition:transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;
+    }
+    .btn-main:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,214,143,.25);}
+    .btn-main:active{transform:translateY(0);}
+
+    .divider{display:flex;align-items:center;gap:.8rem;margin:1.3rem 0;color:var(--muted);font-size:.73rem;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    .link-row{text-align:center;font-size:.85rem;color:var(--muted);}
+    .link-row a{color:var(--accent);font-weight:600;text-decoration:none;transition:opacity .2s;}
+    .link-row a:hover{opacity:.75;}
+
+    /* Flash messages */
+    .flash-msg{
+      padding:.7rem 1rem;border-radius:10px;font-size:.82rem;
+      margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;
+    }
+    .flash-error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--danger);}
+    .flash-success{background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.2);color:var(--accent);}
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- LEFT PANE -->
+  <div class="left-pane">
+    <div class="blob-b"></div>
+    <div class="l-brand"><span class="brand-dot"></span>ExpenseIQ</div>
+    <div class="l-center">
+      <div class="feat-list">
+        <div class="feat-item">
+          <div class="fi-ico fi-g"><i class="bi bi-receipt"></i></div>
+          <div><div class="fi-t">Smart Expense Tracking</div><div class="fi-d">Log, categorise, and manage every transaction instantly.</div></div>
+        </div>
+        <div class="feat-item">
+          <div class="fi-ico fi-b"><i class="bi bi-bar-chart-line-fill"></i></div>
+          <div><div class="fi-t">Visual Analytics</div><div class="fi-d">Interactive charts reveal where your money goes each month.</div></div>
+        </div>
+        <div class="feat-item">
+          <div class="fi-ico fi-a"><i class="bi bi-cpu-fill"></i></div>
+          <div><div class="fi-t">ML-Powered Predictions</div><div class="fi-d">Our model forecasts your next month's expenses with precision.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="l-tagline">
+      <h2>Track smarter,<br>save <span>better.</span></h2>
+      <p>AI-powered expense management that learns your spending habits.</p>
+    </div>
+    <div class="l-quote">&#11088; <strong>"Finally understand where my salary goes."</strong> — ML predictions changed how I plan my budget entirely.</div>
+  </div>
+
+  <!-- RIGHT PANE -->
+  <div class="right-pane">
+    <div class="form-box">
+      <div class="mob-brand"><span class="brand-dot"></span>ExpenseIQ</div>
+
+      <p class="f-eyebrow"><i class="bi bi-shield-check me-1"></i>Secure Login</p>
+      <h1 class="f-title">Welcome back</h1>
+      <p class="f-sub">Sign in to your ExpenseIQ account to continue tracking.</p>
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">
+              <i class="bi bi-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }}"></i>
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form action="/login" method="POST" novalidate id="loginForm">
+        <div class="field-wrap">
+          <label class="field-label" for="email">Email Address</label>
+          <div class="input-shell">
+            <input type="email" id="email" name="email" class="f-input" placeholder="you@example.com" autocomplete="email" required value="{{ request.form.email if request.form.email }}"/>
+            <i class="bi bi-envelope fi-i"></i>
+          </div>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label" for="password">Password</label>
+          <div class="input-shell">
+            <input type="password" id="password" name="password" class="f-input" placeholder="Enter your password" autocomplete="current-password" required/>
+            <i class="bi bi-lock fi-i"></i>
+            <button type="button" class="pw-toggle" id="pwBtn"><i class="bi bi-eye" id="pwIcon"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn-main mt-3" id="submitBtn">
+          <i class="bi bi-box-arrow-in-right"></i> Sign In
+        </button>
+      </form>
+
+      <div class="divider">or</div>
+      <div class="link-row">Don't have an account? <a href="/register">Create one free →</a></div>
+    </div>
+  </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('pwBtn').addEventListener('click',function(){
+    const pw=document.getElementById('password');
+    const icon=document.getElementById('pwIcon');
+    if(pw.type==='password'){pw.type='text';icon.className='bi bi-eye-slash';}
+    else{pw.type='password';icon.className='bi bi-eye';}
+  });
+  document.getElementById('loginForm').addEventListener('submit',function(){
+    const btn=document.getElementById('submitBtn');
+    btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Signing in…';
+    btn.disabled=true;
+  });
+</script>
+</body>
+</html>

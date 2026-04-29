@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ — Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0b0f1a;--surface:#111827;--s2:#1a2236;--s3:#1f2a3e;
+      --border:rgba(255,255,255,0.07);--bh:rgba(255,255,255,0.13);
+      --accent:#00d68f;--a2:#3b82f6;--a3:#f59e0b;--a4:#ec4899;--a5:#8b5cf6;
+      --text:#f1f5f9;--muted:#64748b;--danger:#f87171;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+    body::before{
+      content:'';position:fixed;inset:0;
+      background:radial-gradient(ellipse 800px 600px at 5% 0%,rgba(0,214,143,.06) 0%,transparent 60%),
+                 radial-gradient(ellipse 600px 500px at 95% 100%,rgba(59,130,246,.06) 0%,transparent 55%);
+      pointer-events:none;z-index:0;
+    }
+
+    /* NAVBAR */
+    .navbar{background:rgba(11,15,26,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:.85rem 2rem;position:sticky;top:0;z-index:200;}
+    .brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;letter-spacing:-.4px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:.5rem;}
+    .brand-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent);}
+    .nav-pill{display:flex;align-items:center;gap:.25rem;background:var(--surface);border:1px solid var(--border);border-radius:50px;padding:.3rem .4rem;}
+    .np-link{color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:500;padding:.32rem .8rem;border-radius:50px;transition:all .18s;}
+    .np-link:hover{color:var(--text);background:rgba(255,255,255,.06);}
+    .np-link.active{color:var(--accent);background:rgba(0,214,143,.08);}
+    .btn-logout{display:flex;align-items:center;gap:.35rem;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.22);color:var(--danger);border-radius:50px;padding:.38rem 1rem;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .2s;}
+    .btn-logout:hover{background:rgba(248,113,113,.18);color:var(--danger);}
+    .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));color:#021a0e;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+    /* PAGE */
+    .page-wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:2.4rem 1.5rem 4rem;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+    .a1{animation:slideUp .4s ease both;}
+    .a2{animation:slideUp .4s .06s ease both;}
+    .a3{animation:slideUp .4s .12s ease both;}
+    .a4{animation:slideUp .4s .18s ease both;}
+
+    /* HERO */
+    .hero{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:2rem 2.4rem;margin-bottom:1.6rem;position:relative;overflow:hidden;}
+    .hero::after{content:'';position:absolute;top:0;right:0;width:280px;height:100%;background:linear-gradient(135deg,transparent 40%,rgba(0,214,143,.04));pointer-events:none;}
+    .hero-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.22);color:var(--accent);border-radius:50px;font-size:.68rem;font-weight:700;padding:.22rem .75rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.85rem;}
+    .hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
+    .hero-title{font-family:'Syne',sans-serif;font-size:1.85rem;font-weight:800;letter-spacing:-.5px;margin-bottom:.35rem;line-height:1.2;}
+    .hero-sub{color:var(--muted);font-size:.875rem;line-height:1.6;max-width:480px;}
+    .kpi-row{display:flex;gap:1.6rem;margin-top:1.6rem;flex-wrap:wrap;}
+    .kpi-item{display:flex;flex-direction:column;}
+    .kpi-val{font-family:'Syne',sans-serif;font-size:1.55rem;font-weight:800;letter-spacing:-.4px;}
+    .kpi-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:.1rem;}
+    .kpi-sep{width:1px;background:var(--border);align-self:stretch;}
+
+    /* SECTION LABEL */
+    .sec-label{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.85rem;}
+
+    /* KPI CARDS */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.6rem;}
+    .kc{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:1.3rem 1.4rem;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
+    .kc:hover{transform:translateY(-2px);}
+    .kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+    .kc.k1::before{background:var(--accent);} .kc.k1:hover{border-color:rgba(0,214,143,.3);}
+    .kc.k2::before{background:var(--a2);}      .kc.k2:hover{border-color:rgba(59,130,246,.3);}
+    .kc.k3::before{background:var(--a3);}      .kc.k3:hover{border-color:rgba(245,158,11,.3);}
+    .kc.k4::before{background:var(--a5);}      .kc.k4:hover{border-color:rgba(139,92,246,.3);}
+    .kc-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.9rem;}
+    .kc-val{font-family:'Syne',sans-serif;font-size:1.65rem;font-weight:800;letter-spacing:-.5px;line-height:1;margin-bottom:.25rem;}
+    .kc-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+    /* FEATURE CARDS */
+    .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;margin-bottom:1.6rem;}
+    .feat-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:1.4rem;text-decoration:none;color:var(--text);transition:all .22s;display:flex;flex-direction:column;gap:.85rem;position:relative;overflow:hidden;}
+    .feat-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.3);}
+    .fc-sage:hover{border-color:rgba(0,214,143,.3);} .fc-blue:hover{border-color:rgba(59,130,246,.3);}
+    .fc-amber:hover{border-color:rgba(245,158,11,.3);} .fc-purple:hover{border-color:rgba(139,92,246,.3);}
+    .fc-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;}
+    .ic-g{background:rgba(0,214,143,.1);color:var(--accent);}  .ic-b{background:rgba(59,130,246,.1);color:var(--a2);}
+    .ic-a{background:rgba(245,158,11,.1);color:var(--a3);}      .ic-p{background:rgba(139,92,246,.1);color:var(--a5);}
+    .fc-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.2rem;}
+    .fc-desc{font-size:.8rem;color:var(--muted);line-height:1.55;}
+    .fc-action{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;margin-top:auto;transition:gap .18s;}
+    .fc-sage .fc-action{color:var(--accent);} .fc-blue .fc-action{color:var(--a2);}
+    .fc-amber .fc-action{color:var(--a3);} .fc-purple .fc-action{color:var(--a5);}
+    .feat-card:hover .fc-action{gap:.6rem;}
+
+    /* BOTTOM ROW */
+    .bot-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    @media(max-width:768px){.bot-row{grid-template-columns:1fr;}}
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:1.4rem 1.5rem;}
+    .panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .panel-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;}
+    .panel-link{font-size:.75rem;color:var(--accent);text-decoration:none;font-weight:600;}
+    .panel-link:hover{opacity:.75;}
+
+    /* TRANSACTIONS */
+    .tx-row{display:flex;align-items:center;gap:.8rem;padding:.65rem 0;border-bottom:1px solid var(--border);transition:padding .15s;}
+    .tx-row:last-child{border-bottom:none;}
+    .tx-row:hover{padding-left:.4rem;}
+    .tx-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;background:var(--s2);}
+    .tx-name{font-size:.85rem;font-weight:600;}
+    .tx-cat{font-size:.7rem;color:var(--muted);}
+    .tx-amt{margin-left:auto;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--danger);white-space:nowrap;}
+
+    /* SUMMARY */
+    .sum-grid{display:flex;flex-direction:column;gap:.7rem;}
+    .sum-row{display:flex;flex-direction:column;gap:.28rem;}
+    .sum-top{display:flex;justify-content:space-between;font-size:.78rem;}
+    .sum-top span:first-child{color:var(--muted);}
+    .sum-top span:last-child{font-weight:600;color:var(--text);}
+    .bar-track{height:5px;background:var(--s2);border-radius:99px;overflow:hidden;}
+    .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#00b87a);}
+
+    .kpi-nums{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);}
+    .kn-item{display:flex;flex-direction:column;}
+    .kn-val{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;}
+    .kn-lbl{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+
+    .no-data{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;line-height:1.7;}
+    .no-data i{font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.5;}
+    .no-data a{color:var(--accent);font-weight:600;text-decoration:none;}
+
+    @media(max-width:576px){.hero-title{font-size:1.4rem;}.kpi-row,.kpi-grid{grid-template-columns:1fr 1fr;}.feat-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="d-flex align-items-center justify-content-between w-100 gap-3">
+    <a href="/dashboard" class="brand"><span class="brand-dot"></span>ExpenseIQ</a>
+    <div class="nav-pill d-none d-md-flex">
+      <a href="/dashboard"  class="np-link active"><i class="bi bi-grid-fill me-1"></i>Dashboard</a>
+      <a href="/expenses"   class="np-link"><i class="bi bi-list-ul me-1"></i>Expenses</a>
+      <a href="/analytics"  class="np-link"><i class="bi bi-bar-chart-line me-1"></i>Analytics</a>
+      <a href="/prediction" class="np-link"><i class="bi bi-cpu me-1"></i>Predict</a>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <a href="/logout" class="btn-logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
+      <div class="avatar">{{ user[0]|upper if user else 'U' }}</div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <div class="hero a1 mb-4">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+      <div>
+        <span class="hero-tag">Live Overview</span>
+        <h1 class="hero-title">Welcome, {{ user }} 👋</h1>
+        <p class="hero-sub">Real-time snapshot of your finances. Every rupee tracked, every pattern learned.</p>
+        <div class="kpi-row">
+          <div class="kpi-item">
+            <span class="kpi-val" style="color:var(--danger)">₹{{ "%.2f"|format(total_spent|float) if total_spent is not none else '0.00' }}</span>
+            <span class="kpi-lbl">Total Spent</span>
+          </div>
+          <div class="kpi-sep"></div>
+          <div class="kpi-item">
+            <span class="kpi-val" style="color:var(--accent)">{{ total_transactions if total_transactions is not none else '0' }}</span>
+            <span class="kpi-lbl">Transactions</span>
+          </div>
+          <div class="kpi-sep"></div>
+          <div class="kpi-item">
+            <span class="kpi-val" style="color:var(--a3)">{{ top_category if top_category else '—' }}</span>
+            <span class="kpi-lbl">Top Category</span>
+          </div>
+          <div class="kpi-sep"></div>
+          <div class="kpi-item">
+            <span class="kpi-val" style="color:var(--a5)">
+              {% if predicted_expense is not none %}₹{{ "%.2f"|format(predicted_expense|float) }}{% else %}—{% endif %}
+            </span>
+            <span class="kpi-lbl">ML Forecast</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI STAT CARDS -->
+  <p class="sec-label a2">At a Glance</p>
+  <div class="kpi-grid a2">
+    <div class="kc k1">
+      <div class="kc-ico" style="background:rgba(0,214,143,.1);color:var(--accent)"><i class="bi bi-cash-stack"></i></div>
+      <div class="kc-val" style="color:var(--accent)">₹{{ "%.2f"|format(total_spent|float) if total_spent is not none else '0.00' }}</div>
+      <div class="kc-lbl">Total Spent</div>
+    </div>
+    <div class="kc k2">
+      <div class="kc-ico" style="background:rgba(59,130,246,.1);color:var(--a2)"><i class="bi bi-receipt"></i></div>
+      <div class="kc-val" style="color:var(--a2)">{{ total_transactions if total_transactions is not none else '0' }}</div>
+      <div class="kc-lbl">Total Transactions</div>
+    </div>
+    <div class="kc k3">
+      <div class="kc-ico" style="background:rgba(245,158,11,.1);color:var(--a3)"><i class="bi bi-calculator"></i></div>
+      <div class="kc-val" style="color:var(--a3)">
+        {% if average_expense is not none %}₹{{ "%.2f"|format(average_expense|float) }}{% else %}—{% endif %}
+      </div>
+      <div class="kc-lbl">Avg per Entry</div>
+    </div>
+    <div class="kc k4">
+      <div class="kc-ico" style="background:rgba(139,92,246,.1);color:var(--a5)"><i class="bi bi-cpu-fill"></i></div>
+      <div class="kc-val" style="color:var(--a5)">
+        {% if predicted_expense is not none %}₹{{ "%.0f"|format(predicted_expense|float) }}{% else %}—{% endif %}
+      </div>
+      <div class="kc-lbl">ML Prediction</div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <p class="sec-label a3">Quick Actions</p>
+  <div class="feat-grid a3">
+    <a href="/add_expense" class="feat-card fc-sage">
+      <div class="fc-ico ic-g"><i class="bi bi-plus-circle-fill"></i></div>
+      <div><div class="fc-title">Add Expense</div><div class="fc-desc">Log a new transaction instantly with title, amount, and category.</div></div>
+      <span class="fc-action">Add now <i class="bi bi-arrow-right"></i></span>
+    </a>
+    <a href="/expenses" class="feat-card fc-blue">
+      <div class="fc-ico ic-b"><i class="bi bi-list-ul"></i></div>
+      <div><div class="fc-title">View Expenses</div><div class="fc-desc">Browse, filter, and manage your complete transaction history.</div></div>
+      <span class="fc-action">View all <i class="bi bi-arrow-right"></i></span>
+    </a>
+    <a href="/analytics" class="feat-card fc-amber">
+      <div class="fc-ico ic-a"><i class="bi bi-bar-chart-line-fill"></i></div>
+      <div><div class="fc-title">Analytics</div><div class="fc-desc">Visualise spending patterns, category breakdowns, and monthly trends.</div></div>
+      <span class="fc-action">Explore <i class="bi bi-arrow-right"></i></span>
+    </a>
+    <a href="/prediction" class="feat-card fc-purple">
+      <div class="fc-ico ic-p"><i class="bi bi-cpu-fill"></i></div>
+      <div><div class="fc-title">ML Prediction</div><div class="fc-desc">Get an AI-powered forecast of your next month's total expenses.</div></div>
+      <span class="fc-action">Predict <i class="bi bi-arrow-right"></i></span>
+    </a>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <p class="sec-label a4">Live Data</p>
+  <div class="bot-row a4">
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Recent Transactions</span>
+        <a href="/expenses" class="panel-link">View all →</a>
+      </div>
+      {% if recent_expenses %}
+        {% for expense in recent_expenses %}
+        <div class="tx-row">
+          <div class="tx-ico">
+            {% if expense.category_name == 'Food' %}🍕
+            {% elif expense.category_name == 'Transport' %}🚌
+            {% elif expense.category_name == 'Shopping' %}🛍️
+            {% elif expense.category_name == 'Health' %}💊
+            {% elif expense.category_name == 'Education' %}📚
+            {% elif expense.category_name == 'Utilities' %}💡
+            {% elif expense.category_name == 'Travel' %}✈️
+            {% else %}📦{% endif %}
+          </div>
+          <div>
+            <div class="tx-name">{{ expense.title }}</div>
+            <div class="tx-cat">{{ expense.category_name }} · {{ expense.date }}</div>
+          </div>
+          <span class="tx-amt">−₹{{ "%.2f"|format(expense.amount|float) }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-data">
+          <i class="bi bi-inbox"></i>
+          No transactions yet.<br>
+          <a href="/add_expense">Add your first expense →</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- CATEGORY SUMMARY -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Category Summary</span>
+        <a href="/analytics" class="panel-link">Full report →</a>
+      </div>
+      {% if category_summary %}
+        <div class="sum-grid">
+          {% for cat in category_summary %}
+          <div class="sum-row">
+            <div class="sum-top">
+              <span>{{ cat.category_name }}</span>
+              <span>₹{{ "%.0f"|format(cat.total|float) }}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:{{ cat.percentage if cat.percentage else 0 }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="kpi-nums">
+          <div class="kn-item"><span class="kn-val" style="color:var(--danger)">₹{{ "%.2f"|format(total_spent|float) if total_spent is not none else '0.00' }}</span><span class="kn-lbl">Total</span></div>
+          <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+          <div class="kn-item"><span class="kn-val" style="color:var(--accent)">{{ total_transactions if total_transactions is not none else 0 }}</span><span class="kn-lbl">Entries</span></div>
+          <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+          <div class="kn-item"><span class="kn-val" style="color:var(--a3)">₹{{ "%.0f"|format(average_expense|float) if average_expense is not none else '0' }}</span><span class="kn-lbl">Avg</span></div>
+        </div>
+      {% else %}
+        <div class="no-data">
+          <i class="bi bi-pie-chart"></i>
+          No category data yet.<br>
+          <a href="/add_expense">Start adding expenses →</a>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
